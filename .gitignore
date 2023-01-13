@@ -3,5 +3,6 @@
 /pgadmin
 /pgdata
 /queries.yaml
+/redis
 
 docker-compose.yaml

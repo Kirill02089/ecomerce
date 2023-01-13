@@ -1,5 +1,14 @@
+import { ApolloServerContext } from 'src/types'
 import { Post } from '../entities/Post'
-import { Arg, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  Query,
+  Resolver
+} from 'type-graphql'
 
 @InputType()
 class AddPostInput implements Partial<Post> {
@@ -19,8 +28,20 @@ class UpdatePostInput implements Partial<Post> {
 @Resolver(Post)
 export class PostResolver {
   @Query(() => [Post])
-  async posts() {
-    return Post.find()
+  async posts(@Ctx() { redis }: ApolloServerContext) {
+    const key = 'posts'
+    let posts = null
+
+    try {
+      posts = JSON.parse((await redis.get(key)) || '') as Post[]
+    } catch (error) {}
+
+    if (!posts) {
+      posts = await Post.find()
+      await redis.set(key, JSON.stringify(posts))
+    }
+
+    return posts
   }
 
   @Mutation(() => Post)
