@@ -1,8 +1,13 @@
 import 'reflect-metadata'
-import { Post } from "./entities/Post"
 import { connectionSource } from './ormconfig'
+import Fastify, { FastifyInstance } from 'fastify'
+import { ApolloServer } from 'apollo-server-fastify'
+import { buildSchema } from 'type-graphql'
+import { PostResolver } from './resolvers/post'
 
-async function main() {
+const server: FastifyInstance = Fastify({})
+
+const start = async () => {
     try {
         await connectionSource.initialize()
     } catch (error) {
@@ -10,19 +15,23 @@ async function main() {
         return
     }
 
-    console.log("Data Source has been initialized!")
-
-
-    const post = new Post()
-    post.title = ' sdfsdf s'
-
-    await post.save()
-
-    const posts = await Post.find()
-    console.log(posts);
-    
+    const apollo = new ApolloServer({
+        schema: await buildSchema({
+            resolvers: [PostResolver],
+            validate: false,
+        }),
+    })
+      
+    try {
+        await apollo.start()
+        await server.register(apollo.createHandler());
+        await server.listen({ port: 3000 })
+        console.log('Start listening ', 3000);
+    } catch (err) {
+        server.log.error(err)
+        process.exit(1)
+    }
 }
-
-main().catch(e => {
+start().catch(e => {
     console.error(e);
 }) 
