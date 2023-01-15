@@ -1,5 +1,5 @@
-import type { CodegenConfig } from '@graphql-codegen/cli';
-import { join } from 'node:path';
+import type { CodegenConfig } from '@graphql-codegen/cli'
+import { join } from 'node:path'
 
 const config: CodegenConfig = {
   schema: join(__dirname, './schemas/*.ts'),
@@ -16,11 +16,11 @@ const config: CodegenConfig = {
         mapperTypeSuffix: 'Model',
         mappers: {
           User: './entities/User#User',
-          Post: './entities/Post#Post',
+          Post: './entities/Post#Post'
         }
-      },
-    },
-  },
-};
+      }
+    }
+  }
+}
 
-export default config;
+export default config

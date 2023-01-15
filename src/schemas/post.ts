@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import gql from 'graphql-tag'
 
 export default gql`
   type Post {
@@ -7,7 +7,7 @@ export default gql`
     updatedAt: String!
     title: String!
   }
-  
+
   type Query {
     posts: [Post]
     post: Post

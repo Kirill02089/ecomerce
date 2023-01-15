@@ -7,7 +7,10 @@ import { parsedEnv } from './constants'
 import fastifyJwt from '@fastify/jwt'
 import { ApolloServerContext } from './types'
 import { ApolloServer } from '@apollo/server'
-import fastifyApollo, { ApolloFastifyContextFunction, fastifyApolloDrainPlugin } from '@as-integrations/fastify'
+import fastifyApollo, {
+  ApolloFastifyContextFunction,
+  fastifyApolloDrainPlugin
+} from '@as-integrations/fastify'
 import { resolvers } from './resolvers'
 import { getSchemas } from './schemas'
 
@@ -19,14 +22,16 @@ const start = async () => {
   const apollo = new ApolloServer<ApolloServerContext>({
     typeDefs: await getSchemas(),
     resolvers,
-    plugins: [fastifyApolloDrainPlugin(server)],
+    plugins: [fastifyApolloDrainPlugin(server)]
   })
 
-  const myContextFunction: ApolloFastifyContextFunction<ApolloServerContext> = async (request, reply) => ({
+  const myContextFunction: ApolloFastifyContextFunction<
+    ApolloServerContext
+  > = async (request, reply) => ({
     req: request,
     reply,
-    redis,
-  });
+    redis
+  })
 
   await apollo.start()
   await server.register(fastifyApollo(apollo), {
@@ -58,5 +63,4 @@ const start = async () => {
 
 start().catch((e) => {
   console.error(e)
-  
 })

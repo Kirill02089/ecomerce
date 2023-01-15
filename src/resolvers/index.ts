@@ -1,8 +1,8 @@
-import { Resolvers } from "../resolvers-types";
-import { postResolver } from "./post";
+import { Resolvers } from '../resolvers-types'
+import { postResolver } from './post'
 
 export const resolvers: Resolvers = {
-    Query: {
-        ...postResolver,
-    }
+  Query: {
+    ...postResolver
+  }
 }

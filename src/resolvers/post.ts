@@ -10,7 +10,6 @@
 //   Resolver
 // } from 'type-graphql'
 
-
 // @InputType()
 // class AddPostInput implements Partial<Post> {
 //   @Field()
@@ -70,11 +69,11 @@
 //     return true
 //   }
 // }
-import { Post } from "../entities/Post";
-import { QueryResolvers } from "../resolvers-types";
+import { Post } from '../entities/Post'
+import { QueryResolvers } from '../resolvers-types'
 
 export const postResolver: Partial<QueryResolvers> = {
-    posts: async () => {
-        return await Post.find()
-    }
+  posts: async () => {
+    return await Post.find()
+  }
 }

@@ -1,6 +1,6 @@
-import userSchema from './user';
-import postSchema from './post';
- 
+import userSchema from './user'
+import postSchema from './post'
+
 export async function getSchemas() {
-    return [userSchema, postSchema]
+  return [userSchema, postSchema]
 }
