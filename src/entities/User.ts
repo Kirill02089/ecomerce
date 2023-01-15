@@ -1,23 +1,26 @@
 import {
-  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  BaseEntity,
+  CreateDateColumn,
+  UpdateDateColumn,
   Column,
-  UpdateDateColumn
+  BaseEntity
 } from 'typeorm'
 
 @Entity()
-export class Post extends BaseEntity {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
+
+  @Column({ unique: true })
+  username!: string
+
+  @Column()
+  password!: string
 
   @CreateDateColumn()
   createdAt: Date
 
   @UpdateDateColumn()
   updatedAt: Date
-
-  @Column()
-  title!: string
 }
