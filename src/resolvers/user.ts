@@ -52,28 +52,42 @@
 //     return server.jwt.sign({ ...options, id: newUser.id })
 //   }
 
-//   @Mutation(() => String, { nullable: true })
-//   async login(
-//     @Arg('options') options: AddUserInput,
-//     @Ctx() { server }: ApolloServerContext
-//   ) {
-//     let user: User | null = null
+// import { GraphQLError } from "graphql";
+// import { assertDirective } from "graphql";
+import { GraphQLError } from 'graphql'
+import { User } from '../entities/User'
+import { MutationResolvers, QueryResolvers } from '../resolvers-types'
+import argon2 from 'argon2'
 
-//     try {
-//       user = await User.findOneOrFail({ where: { username: options.username } })
+export const userMutationResolver: Partial<MutationResolvers> = {
+  login: async (_, { input }, { fastify }) => {
+    let user: User | null = null
 
-//     } catch (error) {
-//       console.log('error', error);
-//     }
+    try {
+      user = await User.findOneOrFail({ where: { username: input.username } })
+    } catch (error) {
+      throw new GraphQLError('User not found')
+    }
 
-//     if (!user) return null
+    const isVerified = await argon2.verify(user.password, input.password)
 
-//     const isVerified = await argon2.verify(user.password, options.password)
+    if (!isVerified) {
+      throw new GraphQLError('Incorrect password')
+    }
 
-//     if (!isVerified) return null
+    const token = fastify.jwt.sign({
+      ...input,
+      id: user.id,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    } as Partial<User>)
 
-//     const token = server.jwt.sign({ ...options, id: user.id })
+    return token
+  }
+}
 
-//     return token
-//   }
-// }
+export const userQueryResolvers: Partial<QueryResolvers> = {
+  me: async (_, __, { req }) => {
+    return req.user as User
+  }
+}

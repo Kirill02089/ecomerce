@@ -1,6 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { User as UserModel } from './entities/User'
 import { Post as PostModel } from './entities/Post'
+import { ApolloServerContext } from './types'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -12,6 +13,9 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>
 }
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]-?: NonNullable<T[P]>
+}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string
@@ -19,6 +23,20 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
+}
+
+export type LoginInput = {
+  password: Scalars['String']
+  username: Scalars['String']
+}
+
+export type Mutation = {
+  __typename?: 'Mutation'
+  login?: Maybe<Scalars['String']>
+}
+
+export type MutationLoginArgs = {
+  input: LoginInput
 }
 
 export type Post = {
@@ -31,7 +49,7 @@ export type Post = {
 
 export type Query = {
   __typename?: 'Query'
-  post?: Maybe<Post>
+  me?: Maybe<User>
   posts?: Maybe<Array<Maybe<Post>>>
 }
 
@@ -155,6 +173,8 @@ export type DirectiveResolverFn<
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   Int: ResolverTypeWrapper<Scalars['Int']>
+  LoginInput: LoginInput
+  Mutation: ResolverTypeWrapper<{}>
   Post: ResolverTypeWrapper<PostModel>
   Query: ResolverTypeWrapper<{}>
   String: ResolverTypeWrapper<Scalars['String']>
@@ -165,14 +185,28 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']
   Int: Scalars['Int']
+  LoginInput: LoginInput
+  Mutation: {}
   Post: PostModel
   Query: {}
   String: Scalars['String']
   User: UserModel
 }>
 
+export type MutationResolvers<
+  ContextType = ApolloServerContext,
+  ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
+> = ResolversObject<{
+  login?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationLoginArgs, 'input'>
+  >
+}>
+
 export type PostResolvers<
-  ContextType = any,
+  ContextType = ApolloServerContext,
   ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']
 > = ResolversObject<{
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -183,10 +217,10 @@ export type PostResolvers<
 }>
 
 export type QueryResolvers<
-  ContextType = any,
+  ContextType = ApolloServerContext,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
-  post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
   posts?: Resolver<
     Maybe<Array<Maybe<ResolversTypes['Post']>>>,
     ParentType,
@@ -195,7 +229,7 @@ export type QueryResolvers<
 }>
 
 export type UserResolvers<
-  ContextType = any,
+  ContextType = ApolloServerContext,
   ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
 > = ResolversObject<{
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -205,7 +239,8 @@ export type UserResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }>
 
-export type Resolvers<ContextType = any> = ResolversObject<{
+export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
+  Mutation?: MutationResolvers<ContextType>
   Post?: PostResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
   User?: UserResolvers<ContextType>

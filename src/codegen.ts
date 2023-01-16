@@ -12,6 +12,7 @@ const config: CodegenConfig = {
     [join(__dirname, './resolvers-types.ts')]: {
       plugins: ['typescript', 'typescript-resolvers'],
       config: {
+        contextType: './types#ApolloServerContext',
         useIndexSignature: true,
         mapperTypeSuffix: 'Model',
         mappers: {

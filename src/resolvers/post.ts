@@ -72,7 +72,7 @@
 import { Post } from '../entities/Post'
 import { QueryResolvers } from '../resolvers-types'
 
-export const postResolver: Partial<QueryResolvers> = {
+export const postQueryResolver: Partial<QueryResolvers> = {
   posts: async () => {
     return await Post.find()
   }

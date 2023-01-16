@@ -12,16 +12,22 @@ import fastifyApollo, {
   fastifyApolloDrainPlugin
 } from '@as-integrations/fastify'
 import { resolvers } from './resolvers'
-import { getSchemas } from './schemas'
+import typeDefs from './schemas'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { applyMiddleware } from 'graphql-middleware'
+import { permissions } from './middlewares/shield'
 
 const redis = new Redis(parsedEnv.REDIS_URL)
 const server: FastifyInstance = Fastify({})
+const graphqlSchema = applyMiddleware(
+  makeExecutableSchema({ typeDefs, resolvers }),
+  permissions
+)
 
 const start = async () => {
   await connectionSource.initialize()
   const apollo = new ApolloServer<ApolloServerContext>({
-    typeDefs: await getSchemas(),
-    resolvers,
+    schema: graphqlSchema,
     plugins: [fastifyApolloDrainPlugin(server)]
   })
 
@@ -29,6 +35,7 @@ const start = async () => {
     ApolloServerContext
   > = async (request, reply) => ({
     req: request,
+    fastify: server,
     reply,
     redis
   })
@@ -48,14 +55,11 @@ const start = async () => {
     secret: parsedEnv.JWT_SECRET
   })
 
-  // server.addHook('onRequest', async (request, reply) => {
-  //   try {
-  //     const decoded = await request.jwtVerify()
-  //     console.log(decoded)
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // })
+  server.addHook('onRequest', async (request, reply) => {
+    try {
+      await request.jwtVerify()
+    } catch (err) {}
+  })
 
   await server.listen({ port: 3000 })
   console.log('Start listening ', 3000)

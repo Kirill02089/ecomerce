@@ -1,8 +1,13 @@
 import { Resolvers } from '../resolvers-types'
-import { postResolver } from './post'
+import { postQueryResolver } from './post'
+import { userMutationResolver, userQueryResolvers } from './user'
 
 export const resolvers: Resolvers = {
   Query: {
-    ...postResolver
+    ...postQueryResolver,
+    ...userQueryResolvers
+  },
+  Mutation: {
+    ...userMutationResolver
   }
 }

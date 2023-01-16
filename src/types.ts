@@ -5,4 +5,5 @@ export type ApolloServerContext = {
   req: Fastify.FastifyRequest
   reply: Fastify.FastifyReply
   redis: Redis
+  fastify: Fastify.FastifyInstance
 }
